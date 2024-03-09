@@ -1,0 +1,57 @@
+<div class="chatbubble opened" id="{{ chatroom.chatroomId }}">
+    <div class="unexpanded">
+        <div id="header-title">
+            {{ chatroom.name }}
+        </div>
+    </div>
+
+    <div #chatWindowDiv class="chat-window expanded">
+        <!-- Display Loader -->
+        <div class="loader-wrapper" *ngIf="isLoading">
+            <div class="loader">
+                <span>{{ '{' }}</span><span>{{ '}' }}</span>
+            </div>
+        </div>
+
+        <div #chatHistoryDiv class="chat-history" (scroll)="onChatroomScroll($event)">
+            <ul class="messages clearfix" *ngIf="!isLoading">
+                <!-- Display Messages -->
+                <li *ngFor="let message of messages" [ngClass]="{ 'mine': message.author === currentUser.userId, 'other': message.author !== currentUser.userId }">
+                    <div class="msg-sender">{{ message.screenName }}</div>
+                    <div class="msg-content" *ngIf="message.content; else attachment">
+                        <div>{{ message.content }}</div>
+                        <div class="message-status">
+                            <span class="message-time">{{ message.sendingDate / 1e6 | date: 'HH:mm' }}</span>
+                            <img *ngIf="message.author === currentUser.userId" class="message-status-image" [src]="getMessageStatusImage(message.status)" />
+                        </div>
+                    </div>
+                    <ng-template #attachment>
+                        <div>
+                            <img class="msg-attachment clickable" [src]="message.preview ? message.mediaUrls['280x280'] : message.mediaUrls['default']" />
+                        </div>
+                    </ng-template>
+                </li>
+                <li class="clearfix other" *ngIf="!!userTypingEvent">
+                    <div class="msg-sender">{{ userTypingEvent.screenName }}</div>
+                    <div class="user-typing-loading"></div>
+                </li>
+                <li class="chatroom-error" *ngIf="!!chatroomError">
+                    <div>{{ chatroomError }}</div>
+                </li>
+            </ul>
+        </div>
+
+        <div class="chat-input" *ngIf="!isLoading">
+            <div class="flexContainer">
+                <textarea #textAreaInput class="chat-message-input" rows="1" placeholder="Enter Message"
+                    (keydown)="onKeyDown($event)" (input)="onTextAreaInput($event)" [(ngModel)]="messageContent"></textarea>
+                <div class="input-icon">
+                    <label class="upload-file-icon clickable" (click)="fInput.click()">
+                        <img src="https://img.icons8.com/ios-glyphs/25/a9a9a9/attach.png" />
+                    </label>
+                    <input #fInput type="file" (change)="onFileChange($event)" />
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

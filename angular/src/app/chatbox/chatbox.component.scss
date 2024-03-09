@@ -1,0 +1,300 @@
+.chatbubble .unexpanded {
+  color: #fff;
+  text-align: center;
+  display: block;
+  background-color: #5469D4;
+  padding: 10px 15px 10px;
+  position: relative;
+  width: 350px;
+  border-radius: 10px 10px 0 0;
+  font-weight: 800;
+}
+
+.chatbubble .expanded {
+  height: 300px;
+  width: 360px;
+  background-color: #fff;
+  text-align: left;
+  padding: 10px;
+  color: #333;
+  text-shadow: none;
+  font-size: 14px;
+}
+
+.chatbubble .loader-wrapper {
+  margin-top: 50px;
+  text-align: center;
+}
+
+.chatbubble .chat-history {
+  position: relative;
+  height: 246px;
+  padding: 8px 4px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scroll-snap-type: y mandatory;
+  width: 100%;
+}
+
+/* Loader Credit: https://codepen.io/ashmind/pen/zqaqpB */
+.chatbubble .loader {
+  color: slategray;
+  font-family: Consolas, Menlo, Monaco, monospace;
+  font-weight: bold;
+  font-size: 10vh;
+  opacity: 0.8;
+}
+
+.chatbubble .loader span {
+  display: inline-block;
+  -webkit-animation: pulse 0.4s alternate infinite ease-in-out;
+  animation: pulse 0.4s alternate infinite ease-in-out;
+}
+
+.chatbubble .loader span:nth-child(odd) {
+  -webkit-animation-delay: 0.4s;
+  animation-delay: 0.4s;
+}
+
+@-webkit-keyframes pulse {
+  to {
+    -webkit-transform: scale(0.8);
+    transform: scale(0.8);
+    opacity: 0.5;
+  }
+}
+
+@keyframes pulse {
+  to {
+    -webkit-transform: scale(0.8);
+    transform: scale(0.8);
+    opacity: 0.5;
+  }
+}
+
+.messages {
+  list-style: none;
+  padding: 0;
+
+  li {
+    font-size: 14px;
+    margin-bottom: 10px;
+    width: 75%;
+
+    .msg-sender {
+      font-weight: 600;
+    }
+
+    .msg-attachement {
+      width: 100% !important;
+      border-radius: 10px;
+    }
+
+    &.other {
+      float: left;
+
+      .msg-content {
+        padding: 10px;
+        padding-bottom: 20px;
+        color: #fff;
+        background: #789;
+        border-radius: 5px 5px 5px 0;
+        word-wrap: break-word;
+      }
+
+      .message-status {
+        float: right;
+
+        .message-time {
+          font-size: 10px;
+          margin-left: 2px;
+          vertical-align: bottom;
+        }
+
+        .message-status-image {
+          height: 13px;
+          max-width: 100%;
+          vertical-align: middle;
+          object-fit: cover;
+        }
+      }
+    }
+
+    &.mine {
+      float: right;
+      text-align: right;
+
+      .msg-content {
+        padding: 10px;
+        padding-bottom: 20px;
+        text-align: left;
+        color: #fff;
+        background-color: #f08080;
+        border-radius: 5px 5px 0 5px;
+        word-wrap: break-word;
+      }
+
+      .message-status {
+        float: right;
+
+        .message-time {
+          font-size: 10px;
+          margin-right: 2px;
+          vertical-align: bottom;
+        }
+
+        .message-status-image {
+          height: 13px;
+          max-width: 100%;
+          vertical-align: middle;
+          object-fit: cover;
+        }
+      }
+    }
+
+    .msg-placeholder {
+      float: right;
+      text-align: right;
+      padding: 10px;
+      text-align: left;
+      background-color: lightgray;
+      border-radius: 5px 5px 0 5px;
+      width: 100%;
+      height: 50%;
+      display: flex;
+      align-items: center;
+    }
+
+    .msg-error {
+      color: red;
+      font-weight: 800;
+    }
+  }
+
+  .date-separator {
+    display: inline-block;
+    align-items: center;
+    text-align: center;
+    // padding: 0.5em 1em 1em 1em!important;
+    width: 100%;
+    color: #a9a9a9;
+  }
+}
+
+.chat-message-input {
+  // background-image: url('../assets/sendicon.svg');
+  // background-repeat: no-repeat;
+  // background-position-x: 95%;
+  // background-position-y: 50%;
+  // display:inline-block;
+  width: 100%;
+  padding: .375rem .75rem;
+  padding-right: 3em;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: #495057;
+  background-color: #fff;
+  background-clip: padding-box;
+  border: 1px solid #ced4da;
+  border-radius: .25rem;
+  transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+  word-wrap: break-word;
+  resize: none;
+  font-family: inherit;
+  overflow-x: hidden;
+  overflow-y: auto;
+  height: 100%;
+}
+
+.input-icon {
+  padding-right: 0.6em;
+  padding-top: 0.5rem;
+  right: 0;
+  height: 100%;
+
+  input {
+    display: none;
+  }
+}
+
+.flexContainer {
+  display: flex;
+}
+
+.chatroom-error {
+  background-color: rgba(255, 0, 0, 0.8);
+  color: white;
+  position: sticky;
+  bottom: 10px;
+  padding: 10px;
+  text-align: center;
+  width: 100% !important;
+  float: inline-end;
+}
+
+.upload-file-icon {
+  padding: 1em;
+}
+
+.clickable {
+  cursor: pointer;
+}
+
+/**
+   * ==============================================
+   * Dot Flashing
+   * ==============================================
+   */
+.user-typing-loading {
+  position: relative;
+  left: 25px;
+  width: 20px;
+  height: 20px;
+  border-radius: 10px;
+  background-color: #789;
+  color: #789;
+  animation: dotFlashing 1s infinite linear alternate;
+  animation-delay: .5s;
+  margin-top: 5px;
+}
+
+.user-typing-loading::before,
+.user-typing-loading::after {
+  content: '';
+  display: inline-block;
+  position: absolute;
+  top: 0;
+}
+
+.user-typing-loading::before {
+  left: 25px;
+  width: 20px;
+  height: 20px;
+  border-radius: 10px;
+  background-color: #789;
+  color: #789;
+  animation: dotFlashing 1s infinite alternate;
+  animation-delay: 0s;
+}
+
+.user-typing-loading::after {
+  left: 50px;
+  width: 20px;
+  height: 20px;
+  border-radius: 10px;
+  background-color: #789;
+  color: #789;
+  animation: dotFlashing 1s infinite alternate;
+  animation-delay: 1s;
+}
+
+@keyframes dotFlashing {
+  0% {
+    background-color: #789;
+  }
+
+  50%,
+  100% {
+    background-color: #ebe6ff;
+  }
+}

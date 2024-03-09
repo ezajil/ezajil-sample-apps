@@ -1,0 +1,14 @@
+.banner {
+    background: rgba(255, 0, 0, 0.8);
+    backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.banner-content {
+    color: white;
+    /* Text color for the banner */
+    font-size: 24px;
+    /* Adjust the font size */
+}

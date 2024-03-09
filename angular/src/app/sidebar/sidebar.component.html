@@ -1,0 +1,63 @@
+<app-single-chatroom-creation-modal [showModal]="false" [currentUser]="currentUser"
+    (singleChatroomParams)="onSingleChatroomCreation($event)"></app-single-chatroom-creation-modal>
+
+<app-group-chatroom-creation-modal [showModal]="false" [currentUser]="currentUser"
+    (groupChatroomParams)="onGroupChatroomCreation($event)"></app-group-chatroom-creation-modal>
+
+<div class="ezajil-sidebar">
+    <!-- CURRENT USER -->
+    <div class="current-user">
+        <span>{{ currentUser.screenName }}</span>
+        <span id="user-status" [class.online-user]="isOnline" [class.offline-user]="!isOnline">
+            {{ isOnline ? 'online' : 'offline' }}
+        </span>
+    </div>
+
+    <!-- SINGLE CHATROOMS -->
+    <div class="chatroom-list">
+        <div class="section-title">
+            <span>single chatrooms</span>
+            <span class="new-chatroom-btn pl-5" (click)="openSingleChatroomCreationModal()">Add +</span>
+        </div>
+        <ul (scroll)="onSingleChatroomsScroll($event)">
+            <li *ngFor="let singleChatroomTuple of singleChatrooms">
+                <div class="contact-card" (click)="onChatroomClick(singleChatroomTuple[1])">
+                    <div class="avatar">
+                        <img class="avatar-image"
+                            [src]="singleChatroomTuple[0].avatarUrl ? singleChatroomTuple[0].avatarUrl : 'assets/default-avatar.png'">
+                        <span [id]="'status-' + singleChatroomTuple[0].userId"
+                            [ngClass]="{'avatar-status': true, 'online': singleChatroomTuple[0].online, 'offline': !singleChatroomTuple[0].online}"></span>
+                    </div>
+                    <div class="user-info">
+                        <span class="screen-name">{{ singleChatroomTuple[0].screenName || singleChatroomTuple[1].name }}</span> <!-- If receiver not yet created, display chatroom name -->
+                        <span class="last-seen" *ngIf="!singleChatroomTuple[0].online">{{ formatLastSeen(singleChatroomTuple[0].lastSeen) }}</span>
+                    </div>
+                </div>
+            </li>
+        </ul>
+    </div>
+
+    <!-- GROUP CHATROOMS -->
+    <div class="chatroom-list">
+        <div class="section-title">
+            <span>group chatrooms</span>
+            <span class="new-chatroom-btn pl-5" (click)="openGroupChatroomCreationModal()">Add +</span>
+        </div>
+        <ul (scroll)="onGroupChatroomsScroll($event)">
+            <li *ngFor="let groupChatroom of groupChatrooms">
+                <div class="contact-card" (click)="onChatroomClick(groupChatroom)">
+                    <div class="avatar">
+                        <img class="avatar-image" src="assets/default-multi-avatar.png">
+                        <span></span>
+                    </div>
+                    <span class="ml-5">{{ groupChatroom.name }}</span>
+                </div>
+            </li>
+        </ul>
+    </div>
+</div>
+
+<div class="chatbox-container">
+    <app-chatbox *ngFor="let chatroom of visibleChatrooms" [currentUser]="currentUser" [chatroom]="chatroom">
+    </app-chatbox>
+</div>

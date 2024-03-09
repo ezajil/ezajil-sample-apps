@@ -1,0 +1,51 @@
+/* Style the multi-select container */
+.select-container {
+  width: 300px;
+  /* Adjust the width to your preference */
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 5px;
+  background-color: #fff;
+  position: relative;
+  font-family: Arial, sans-serif;
+}
+
+/* Style the multi-select */
+.select-container select {
+  width: 100%;
+  height: 100%;
+  padding: 5px;
+  border: none;
+  background-color: transparent;
+  outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}
+
+/* Style the selected options */
+.select-container select option {
+  background-color: #fff;
+  color: #333;
+}
+
+/* Style the dropdown arrow (if necessary) */
+.select-container select::after {
+  content: "\25BC";
+  /* Unicode down arrow */
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  transform: translateY(-50%);
+}
+
+/* Style on hover/focus for better user feedback (optional) */
+.select-container select:hover,
+.select-container select:focus {
+  border: 1px solid #333;
+}
+
+/* Style the selected options on hover (optional) */
+.select-container select option:hover {
+  background-color: #f0f0f0;
+}

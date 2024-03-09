@@ -1,0 +1,16 @@
+<div class="initial-modal-content" *ngIf="showModal">
+    <span class="close" (click)="closeModal()">&times;</span>
+    <form [formGroup]="groupChatroomForm" (ngSubmit)="onSubmit()">
+        <label for="name">Choose chatroom name:</label>
+        <input type="text" name="name" id="name" formControlName="name" class="text-input-container">
+        <br>
+        <label for="participants">Choose participants: </label>
+        <select multiple id="participants" name="participants" formControlName="participants" class="select-container">
+            <option *ngFor="let userOption of availableParticipants" [value]="userOption[0]">
+                {{userOption[1]}}
+            </option>
+        </select>
+        <br><br><br>
+        <input type="submit" value="Submit" [disabled]="groupChatroomForm.invalid" (click)="onSubmit()">
+    </form>
+</div>

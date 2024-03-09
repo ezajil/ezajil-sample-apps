@@ -1,0 +1,9 @@
+<div class="initial-modal-content" *ngIf="showModal">
+    <form [formGroup]="userForm" (ngSubmit)="onSubmit()">
+        <label for="username">Choose your user: </label>
+        <select name="username" id="username" formControlName="userId" class="single-select-container">
+            <option *ngFor="let userOption of userOptions" [value]="userOption[0]">{{ userOption[1] }}</option>
+        </select>
+        <input type="submit" class="ml-5" value="Submit" [disabled]="userForm.invalid" (click)="onSubmit()">
+    </form>
+</div>

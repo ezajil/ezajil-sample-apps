@@ -1,0 +1,8 @@
+<div class="banner" *ngIf="clientError">
+    <div class="banner-content">
+      {{clientError}}
+    </div>
+  </div>
+
+
+<app-sidebar *ngIf="!clientError" [session]="session" [currentUser]="currentUser" [isOnline]="isOnline"></app-sidebar>

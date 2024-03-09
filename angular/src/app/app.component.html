@@ -1,0 +1,3 @@
+<app-username-selection-modal *ngIf="!selectedUser" [showModal]="true" (userSelected)="onSelectedUser($event)"></app-username-selection-modal>
+
+<app-main *ngIf="selectedUser" [currentUser]="selectedUser"></app-main>
