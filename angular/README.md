@@ -18,7 +18,7 @@ npm install
 ```bash
 npm start
 ```
-7. Open your browser and navigate to http://localhost:4200 to view the sample project.
+7. Open your browser and navigate to http://localhost:3000 to view the sample project.
 
 ## Usage
 This sample project demonstrates how to use the ezajil Chat Application SDK to implement real-time chat capabilities and presence tracking in an Angular application. It includes examples of creating users, creating chatrooms, sending and receiving messages, presence tracking, and more.
