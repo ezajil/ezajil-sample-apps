@@ -107,7 +107,7 @@ export class ChatboxComponent implements OnInit, OnDestroy {
           this.scrollToLastPosition();
         }
       }
-    }, this.messagesPagingState, 5);
+    }, this.messagesPagingState, 20);
   }
 
   onChatroomScroll(event: Event) {

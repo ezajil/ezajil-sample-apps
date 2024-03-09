@@ -5,7 +5,7 @@ import { GroupChatroomParams } from '../models/GroupChatroomParams';
 import { SingleChatroomParams } from '../models/SingleChatroomParams';
 import { SingleChatroomCreationModalComponent } from '../single-chatroom-creation-modal/single-chatroom-creation-modal.component';
 import { ToastrService } from 'ngx-toastr';
-import * as moment from 'moment';
+import { DateTime } from 'luxon';
 
 @Component({
   selector: 'app-sidebar',
@@ -225,8 +225,8 @@ export class SidebarComponent implements OnInit, OnChanges {
       return null;
     }
     const milliseconds = Math.floor(nanoTimestamp / 1e6);
-    const lastSeenDate = new Date(milliseconds);
-    const duration: string = moment(lastSeenDate).fromNow();
+    const lastSeenDate = DateTime.fromMillis(milliseconds);
+    const duration = lastSeenDate.toRelative();
     return `Last seen ${duration}`;
   }
 }

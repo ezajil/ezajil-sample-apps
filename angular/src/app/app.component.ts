@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { UsernameSelectionModalComponent } from './username-selection-modal/username-selection-modal.component';
 import { User } from 'ezajil-js-sdk';
 
@@ -8,7 +8,7 @@ import { User } from 'ezajil-js-sdk';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
-  @ViewChild(UsernameSelectionModalComponent) 
+  @ViewChild(UsernameSelectionModalComponent)
   modalComponent?: UsernameSelectionModalComponent;
   selectedUser?: User;
 

@@ -1,8 +1,16 @@
-<div class="banner" *ngIf="clientError">
-    <div class="banner-content">
-      {{clientError}}
+<div class="banner" *ngIf="isClientError">
+  <div class="banner-content">
+    {{ reason }} {{ code }}
+    <div *ngIf="code === 401">
+      <p>Possible reasons for this error:</p>
+      <ul>
+        <li>Missing required headers: Ensure all necessary headers are included in the request.</li>
+        <li>The request origin is not allowed: Your current origin ({{ requestOrigin }}) must be explicitly allowed in your ezajil project.</li>
+      </ul>
     </div>
   </div>
+</div>
 
 
-<app-sidebar *ngIf="!clientError" [session]="session" [currentUser]="currentUser" [isOnline]="isOnline"></app-sidebar>
+
+<app-sidebar *ngIf="!isClientError" [session]="session" [currentUser]="currentUser" [isOnline]="isOnline"></app-sidebar>
