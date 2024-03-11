@@ -27,12 +27,6 @@ export class GroupChatroomCreationModalComponent implements OnInit {
   }
 
   ngOnInit() {
-    // Listen for clicks outside the modal and close it
-    // this.renderer.listen('window', 'click', (event: Event) => {
-    //   if (this.showModal && !this.el.nativeElement.contains(event.target)) {
-    //     this.closeModal();
-    //   }
-    // });
   }
 
   openModal() {

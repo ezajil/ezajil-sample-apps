@@ -83,17 +83,16 @@ export class SidebarComponent implements OnInit, OnChanges {
           this.singleChatrooms.some(([_, chatroom]) => chatroom.chatroomId === chatroomId);
 
         if (!isChatroomExist) {
-          this.session.getChatroom(chatroomId, (chatroom, error) => {
-            if (error) {
+          this.session.getChatroom(chatroomId)
+            .then(chatroom => {
+              if (chatroom!.single) {
+                this.addSingleChatroom(chatroom!);
+              } else {
+                this.addGroupChatroom(chatroom!);
+              }
+            }).catch(error => {
               this.toastr.error(error.message, 'error');
-              return;
-            }
-            if (chatroom!.single) {
-              this.addSingleChatroom(chatroom!);
-            } else {
-              this.addGroupChatroom(chatroom!);
-            }
-          });
+            });
         }
         // TODO: display notification
         this.session.markMessageAsDelivered(chatroomId, chatMessage.sendingDate);
@@ -106,25 +105,21 @@ export class SidebarComponent implements OnInit, OnChanges {
   }
 
   private fetchSingleChatrooms() {
-    this.session.getSingleChatroomsOfUser((singleChatrooms, pagingState, _, error) => {
-      if (!!error) {
-        this.toastr.error(error.message, 'error');
-        return;
-      }
-      this.singleChatroomsPagingState = pagingState;
-      singleChatrooms?.forEach(singleChatroom => this.addSingleChatroom(singleChatroom));
-    }, this.singleChatroomsPagingState, 10);
+    this.session.getSingleChatroomsOfUser(this.singleChatroomsPagingState, 10)
+      .then(singleChatroomsPage => {
+        this.singleChatroomsPagingState = singleChatroomsPage.pagingState;
+        singleChatroomsPage.results?.forEach(singleChatroom => this.addSingleChatroom(singleChatroom));
+      })
+      .catch(error => this.toastr.error(error.message, 'error'));
   }
 
   private fetchGroupChatrooms() {
-    this.session.getGroupChatroomsOfUser((groupChatrooms, pagingState, _, error) => {
-      if (!!error) {
-        this.toastr.error(error.message, 'error');
-        return;
-      }
-      this.groupChatroomsPagingState = pagingState;
-      groupChatrooms?.forEach(groupChatroom => this.addGroupChatroom(groupChatroom));
-    }, this.groupChatroomsPagingState, 10);
+    this.session.getGroupChatroomsOfUser(this.groupChatroomsPagingState, 10)
+      .then(groupChatroomsPage => {
+        this.groupChatroomsPagingState = groupChatroomsPage.pagingState;
+        groupChatroomsPage.results?.forEach(groupChatroom => this.addGroupChatroom(groupChatroom));
+      })
+      .catch(error => this.toastr.error(error.message, 'error'));
   }
 
   onSingleChatroomsScroll(event: Event) {
@@ -148,27 +143,20 @@ export class SidebarComponent implements OnInit, OnChanges {
   }
 
   onSingleChatroomCreation(singleChatroomParams: SingleChatroomParams) {
-    this.session.createSingleChatroom(singleChatroomParams.name, singleChatroomParams.participantId, new Map(), (chatroom, error) => {
-      if (error) {
-        this.toastr.error(error.message, 'error');
-        return;
-      }
-      this.addSingleChatroom(chatroom!);
-    });
+    this.session.createSingleChatroom(singleChatroomParams.name, singleChatroomParams.participantId, new Map())
+      .then(chatroom => this.addSingleChatroom(chatroom))
+      .catch(error => this.toastr.error(error.message, 'error'));
   }
 
   addSingleChatroom(chatroom: Chatroom) {
     const alreadyExists = this.singleChatrooms.some(existingChatroom => existingChatroom[1].chatroomId === chatroom.chatroomId);
-    if (!alreadyExists) {
-      const otherUserId = this.resolveOtherUserIdInSingleChatroom(chatroom);
-      this.session.subscribeToUsersPresence([otherUserId], (users, error) => {
-        if (!!error) {
-          this.toastr.error(error.message);
-          return;
-        }
-        this.singleChatrooms.push([users![0], chatroom]);
-      });
+    if (alreadyExists) {
+      return;
     }
+    const otherUserId = this.resolveOtherUserIdInSingleChatroom(chatroom);
+    this.session.subscribeToUsersPresence([otherUserId])
+      .then(users => this.singleChatrooms.push([users![0], chatroom]))
+      .catch(error => this.toastr.error(error.message))
   }
 
   private resolveOtherUserIdInSingleChatroom(singleChatroom: Chatroom): string {
@@ -184,14 +172,9 @@ export class SidebarComponent implements OnInit, OnChanges {
   }
 
   onGroupChatroomCreation(groupChatroomParams: GroupChatroomParams) {
-    this.session.createGroupChatroom(groupChatroomParams.name, groupChatroomParams.participantIds, new Map(),
-      (chatroom, error) => {
-        if (error) {
-          this.toastr.error(error.message);
-          return;
-        }
-        this.addGroupChatroom(chatroom!);
-      });
+    this.session.createGroupChatroom(groupChatroomParams.name, groupChatroomParams.participantIds, new Map())
+    .then(chatroom => this.addGroupChatroom(chatroom))
+    .catch(error => this.toastr.error(error.message))
   }
 
   addGroupChatroom(chatroom: Chatroom) {

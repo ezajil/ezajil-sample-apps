@@ -1,5 +1,5 @@
 import { AfterViewInit, Component, ElementRef, HostListener, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { User, Chatroom, Message, UserTypingEvent } from 'ezajil-js-sdk';
+import { User, Chatroom, Message, UserTypingEvent, APIError } from 'ezajil-js-sdk';
 import { ToastrService } from 'ngx-toastr';
 
 @Component({
@@ -86,28 +86,26 @@ export class ChatboxComponent implements OnInit, OnDestroy {
     }, 10000);
   }
 
-  private fetchChatroomMessages(firstCall: boolean = true) {
-    if (!firstCall && this.messagesPagingState === null) {
-      return; // All messages have been fetched
-    }
-    this.chatroom.getMessages((messages, error) => {
-      if (error) {
-        this.toastr.error(error.message, 'error');
-        return;
-      }
+  private async fetchChatroomMessages(firstCall: boolean = true) {
+    try {
+      const messages = await this.chatroom.getMessages(this.messagesPagingState, 20);
       this.isLoading = false;
-      // TODO: Keep messages data structure in SDK that way markMessagesAsRead wouldn't take an input, messages sorting is done in SDK...
-      messages!.results.forEach(message => this.addNewMessage(message));
-      this.messagesPagingState = messages!.pagingState;
-      if (messages!.results.length > 0) {
+      messages.results.forEach(message => this.addNewMessage(message));
+      this.messagesPagingState = messages.pagingState;
+
+      if (messages.results.length > 0) {
         this.chatroom.markMessageAsRead(this.messages[this.messages.length - 1].sendingDate);
+
         if (firstCall) {
           this.scrollToBottom();
         } else {
           this.scrollToLastPosition();
         }
       }
-    }, this.messagesPagingState, 20);
+    } catch (error) {
+      const apiError = error as APIError;
+      this.toastr.error(apiError.message, 'Error');
+    }
   }
 
   onChatroomScroll(event: Event) {
@@ -216,13 +214,17 @@ export class ChatboxComponent implements OnInit, OnDestroy {
 
   onFileChange(event: any): void {
     const file = event.target.files[0];
-    this.chatroom.uploadFile(file, (uploadMessage, error) => {
-      if (error) {
+    if (!file) {
+      return;
+    }
+
+    this.chatroom.uploadFile(file)
+      .then(uploadMessage => {
+        this.messages = [...this.messages, uploadMessage];
+        this.scrollToBottom();
+      })
+      .catch(error => {
         this.setChatroomError(`${error.message} (${error.status})`);
-        return;
-      }
-      this.messages = [...this.messages, uploadMessage!];
-      this.scrollToBottom();
-    })
+      });
   }
 }
