@@ -4,8 +4,8 @@
     <div *ngIf="code === 401">
       <p>Possible reasons for this error:</p>
       <ul>
-        <li>Missing required headers: Ensure all necessary headers are included in the request.</li>
-        <li>The request origin is not allowed: Your current origin ({{ requestOrigin }}) must be explicitly allowed in your ezajil project.</li>
+        <li>The access token was not provided or is invalid. Ensure that your application correctly retrieves and supplies a valid access token.</li>
+        <li>There is an issue with your token retrieval mechanism. Verify that the fetch token callback function is implemented correctly and successfully obtains a new token when needed.</li>
       </ul>
     </div>
   </div>
