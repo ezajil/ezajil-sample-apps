@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:whatsapp_clone/theme/theme.dart';
 import 'package:whatsapp_clone/views/chat.dart';
+import 'package:whatsapp_clone/views/create_private_chatroom.dart';
 
 import '../models/message.dart';
 import '../models/recent_chat.dart';
@@ -34,7 +35,13 @@ class _HomePageState extends State<HomePage>
     _floatingButtons = [
       FloatingActionButton(
         onPressed: () {
-          // Implement your action
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => CreatePrivateChatroomPage(
+                currentUser: widget.user,
+              ),
+            ),
+          );
         },
         child: const Icon(Icons.chat),
       ),
@@ -125,7 +132,8 @@ class _RecentChatsBodyState extends State<RecentChatsBody> {
   void initState() {
     super.initState();
     // Initialize your chats here, could be from a local source or dummy data
-    chats = []; // TODO: This should be replaced with actual data retrieval logic
+    chats =
+        []; // TODO: This should be replaced with actual data retrieval logic
   }
 
   @override
@@ -144,7 +152,10 @@ class _RecentChatsBodyState extends State<RecentChatsBody> {
             sendingDate: 1712510485958000000,
             status: MessageStatus.READ,
             systemMessage: false),
-        user: User(userId: '2', screenName: 'ezajil2')));// TODO: Update with other user not current one
+        user: User(
+            userId: '2',
+            screenName:
+                'ezajil2'))); // TODO: Update with other user not current one
     return ListView(
       children: [
         Padding(
@@ -289,7 +300,9 @@ class RecentChatWidget extends StatelessWidget {
           if (msgStatus != null) ...[
             Image.asset(
               'assets/images/${msgStatus!.name}.png',
-              color: msgStatus != MessageStatus.READ ? colorTheme.textColor1 : null,
+              color: msgStatus != MessageStatus.READ
+                  ? colorTheme.textColor1
+                  : null,
               width: 15.0,
             ),
             const SizedBox(
