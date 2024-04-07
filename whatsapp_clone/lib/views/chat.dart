@@ -51,7 +51,7 @@ class _ChatPageState extends State<ChatPage> {
       children: [
         CircleAvatar(
           maxRadius: 18,
-          backgroundImage: NetworkImage(widget.other.avatarUrl ?? ''), // Handle null URLs appropriately
+          backgroundImage: NetworkImage(widget.other.avatarUrl ?? 'https://en.gravatar.com/userimage/238463648/8cc16f6f5423605920569a634fd097eb.jpeg?size=256'),
         ),
         const SizedBox(width: 8.0),
         Column(
@@ -93,9 +93,9 @@ class _ChatPageState extends State<ChatPage> {
   Widget _buildBody(BuildContext context) {
     // Main chat page body
     return Container(
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         image: DecorationImage(
-          image: AssetImage('assets/chat_bg.png'), // Update with actual asset path
+          image: AssetImage('assets/images/chat_bg.png'),
           fit: BoxFit.cover,
         ),
       ),
@@ -109,10 +109,10 @@ class _ChatPageState extends State<ChatPage> {
               child: const Text('Chat messages will appear here'), // Replace with actual chat messages widget
             ),
           ),
-          SizedBox(
+          const SizedBox(
             height: 4.0,
           ),
-          Text('Chat input container will go here'), // Replace with actual chat input widget
+          const Text('Chat input container will go here'), // Replace with actual chat input widget
         ],
       ),
     );
