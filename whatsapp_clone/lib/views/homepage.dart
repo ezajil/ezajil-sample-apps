@@ -125,30 +125,26 @@ class _RecentChatsBodyState extends State<RecentChatsBody> {
   void initState() {
     super.initState();
     // Initialize your chats here, could be from a local source or dummy data
-    chats =
-        []; // TODO: This should be replaced with actual data retrieval logic
+    chats = []; // TODO: This should be replaced with actual data retrieval logic
   }
 
   @override
   Widget build(BuildContext context) {
-    final colorTheme = Theme.of(context).custom.colorTheme; // Custom theming
+    final colorTheme = Theme.of(context).custom.colorTheme;
 
-    // if (chats.isEmpty) {
-    //   return const HomePageContactsList(); // Replace with actual empty state widget
-    // }
     chats.add(RecentChat(
         message: Message(
             chatroomId: 'chatid',
             messageId: 'messageid',
-            author: '2',
-            screenName: 'ezajil2',
+            author: '1',
+            screenName: 'ezajil1',
             content: 'tezst',
             mediaUrls: null,
             preview: false,
             sendingDate: 1712510485958000000,
             status: MessageStatus.READ,
             systemMessage: false),
-        user: widget.user));
+        user: User(userId: '2', screenName: 'ezajil2')));// TODO: Update with other user not current one
     return ListView(
       children: [
         Padding(
@@ -292,8 +288,8 @@ class RecentChatWidget extends StatelessWidget {
         children: [
           if (msgStatus != null) ...[
             Image.asset(
-              'assets/images/$msgStatus.png',
-              color: msgStatus != 'SEEN' ? colorTheme.textColor1 : null,
+              'assets/images/${msgStatus!.name}.png',
+              color: msgStatus != MessageStatus.READ ? colorTheme.textColor1 : null,
               width: 15.0,
             ),
             const SizedBox(

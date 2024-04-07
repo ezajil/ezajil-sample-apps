@@ -22,3 +22,20 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+
+  # To add assets to your application, add an assets section, like this:
+  assets:
+    - assets/images/landing_img.png
+    - assets/images/NOT_SENT.png
+    - assets/images/SENT.png
+    - assets/images/DELIVERED.png
+    - assets/images/READ.png
+    - assets/images/dark/chat_bg.png
+    - assets/images/chat_bg.png
+    - assets/images/logo.png
+    - assets/images/avatar.png
+
+  fonts:
+    - family: AzeretMono
+      fonts:
+        - asset: assets/fonts/AzeretMono-Regular.ttf
