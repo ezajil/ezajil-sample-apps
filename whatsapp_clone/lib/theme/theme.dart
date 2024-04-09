@@ -10,60 +10,63 @@ class CustomThemeData {
   CustomThemeData({required bool isDarkTheme}) {
     colorTheme = isDarkTheme
         ? ColorTheme(
-            iconColor: AppColorsDark.iconColor,
-            textColor1: AppColorsDark.textColor1,
-            textColor2: AppColorsDark.textColor2,
-            appBarColor: AppColorsDark.appBarColor,
-            dividerColor: AppColorsDark.dividerColor,
-            backgroundColor: AppColorsDark.backgroundColor,
-            errorSnackBarColor: AppColorsDark.errorSnackBarColor,
-            incomingMessageBubbleColor:
-                AppColorsDark.incomingMessageBubbleColor,
-            outgoingMessageBubbleColor:
-                AppColorsDark.outgoingMessageBubbleColor,
-            incomingEmbedColor: AppColorsDark.incomingEmbedColor,
-            outgoingEmbedColor: AppColorsDark.outgoingEmbedColor,
-            selectedLabelColor: AppColorsDark.selectedLabelColor,
-            unselectedLabelColor: AppColorsDark.unselectedLabelColor,
-            indicatorColor: AppColorsDark.indicatorColor,
-            blueColor: AppColorsDark.blueColor,
-            greenColor: AppColorsDark.greenColor,
-            yellowColor: AppColorsDark.yellowColor,
-            greyColor: AppColorsDark.greyColor,
-            statusBarColor: AppColorsDark.statusBarColor,
-            navigationBarColor: AppColorsDark.navigationBarColor,
-          )
+      iconColor: AppColorsDark.iconColor,
+      textColor1: AppColorsDark.textColor1,
+      textColor2: AppColorsDark.textColor2,
+      appBarColor: AppColorsDark.appBarColor,
+      dividerColor: AppColorsDark.dividerColor,
+      backgroundColor: AppColorsDark.backgroundColor,
+      errorSnackBarColor: AppColorsDark.errorSnackBarColor,
+      incomingMessageBubbleColor:
+      AppColorsDark.incomingMessageBubbleColor,
+      outgoingMessageBubbleColor:
+      AppColorsDark.outgoingMessageBubbleColor,
+      incomingEmbedColor: AppColorsDark.incomingEmbedColor,
+      outgoingEmbedColor: AppColorsDark.outgoingEmbedColor,
+      selectedLabelColor: AppColorsDark.selectedLabelColor,
+      unselectedLabelColor: AppColorsDark.unselectedLabelColor,
+      indicatorColor: AppColorsDark.indicatorColor,
+      blueColor: AppColorsDark.blueColor,
+      greenColor: AppColorsDark.greenColor,
+      yellowColor: AppColorsDark.yellowColor,
+      greyColor: AppColorsDark.greyColor,
+      statusBarColor: AppColorsDark.statusBarColor,
+      navigationBarColor: AppColorsDark.navigationBarColor,
+    )
         : ColorTheme(
-            iconColor: AppColorsLight.iconColor,
-            textColor1: AppColorsLight.textColor1,
-            textColor2: AppColorsLight.textColor2,
-            appBarColor: AppColorsLight.appBarColor,
-            dividerColor: AppColorsLight.dividerColor,
-            backgroundColor: AppColorsLight.backgroundColor,
-            errorSnackBarColor: AppColorsLight.errorSnackBarColor,
-            incomingMessageBubbleColor:
-                AppColorsLight.incomingMessageBubbleColor,
-            outgoingMessageBubbleColor:
-                AppColorsLight.outgoingMessageBubbleColor,
-            incomingEmbedColor: AppColorsLight.incomingEmbedColor,
-            outgoingEmbedColor: AppColorsLight.outgoingEmbedColor,
-            selectedLabelColor: AppColorsLight.selectedLabelColor,
-            unselectedLabelColor: AppColorsLight.unselectedLabelColor,
-            indicatorColor: AppColorsLight.indicatorColor,
-            blueColor: AppColorsLight.blueColor,
-            greenColor: AppColorsLight.greenColor,
-            yellowColor: AppColorsLight.yellowColor,
-            greyColor: AppColorsLight.greyColor,
-            statusBarColor: AppColorsLight.statusBarColor,
-            navigationBarColor: AppColorsLight.navigationBarColor,
-          );
+      iconColor: AppColorsLight.iconColor,
+      textColor1: AppColorsLight.textColor1,
+      textColor2: AppColorsLight.textColor2,
+      appBarColor: AppColorsLight.appBarColor,
+      dividerColor: AppColorsLight.dividerColor,
+      backgroundColor: AppColorsLight.backgroundColor,
+      errorSnackBarColor: AppColorsLight.errorSnackBarColor,
+      incomingMessageBubbleColor:
+      AppColorsLight.incomingMessageBubbleColor,
+      outgoingMessageBubbleColor:
+      AppColorsLight.outgoingMessageBubbleColor,
+      incomingEmbedColor: AppColorsLight.incomingEmbedColor,
+      outgoingEmbedColor: AppColorsLight.outgoingEmbedColor,
+      selectedLabelColor: AppColorsLight.selectedLabelColor,
+      unselectedLabelColor: AppColorsLight.unselectedLabelColor,
+      indicatorColor: AppColorsLight.indicatorColor,
+      blueColor: AppColorsLight.blueColor,
+      greenColor: AppColorsLight.greenColor,
+      yellowColor: AppColorsLight.yellowColor,
+      greyColor: AppColorsLight.greyColor,
+      statusBarColor: AppColorsLight.statusBarColor,
+      navigationBarColor: AppColorsLight.navigationBarColor,
+    );
   }
 }
 
+// THEME PROVIDERS
+final darkThemeProvider = _darkTheme;
+final lightThemeProvider = _theme;
 
 // THEMES
 // Light theme (Not implemented yet)
-final _customTheme = CustomThemeData(isDarkTheme: false);
+final customTheme = CustomThemeData(isDarkTheme: false);
 final _theme = ThemeData(
   brightness: Brightness.light,
   dialogTheme: DialogTheme(
@@ -73,7 +76,7 @@ final _theme = ThemeData(
     ),
     backgroundColor: AppColorsLight.backgroundColor,
     titleTextStyle:
-        const TextStyle(color: AppColorsLight.textColor1, fontSize: 16),
+    const TextStyle(color: AppColorsLight.textColor1, fontSize: 16),
     contentTextStyle: const TextStyle(
       color: AppColorsLight.textColor1,
       fontSize: 16,
@@ -127,7 +130,7 @@ final _darkTheme = ThemeData(
     ),
     backgroundColor: AppColorsDark.appBarColor,
     titleTextStyle:
-        const TextStyle(color: AppColorsLight.textColor1, fontSize: 16),
+    const TextStyle(color: AppColorsLight.textColor1, fontSize: 16),
     contentTextStyle: const TextStyle(
       color: AppColorsLight.textColor1,
       fontSize: 16,
@@ -173,11 +176,11 @@ final _darkTheme = ThemeData(
 // EXTENSION
 extension CustomTheme on ThemeData {
   CustomThemeData get custom =>
-      brightness == Brightness.dark ? _customDarkTheme : _customTheme;
+      brightness == Brightness.dark ? _customDarkTheme : customTheme;
 
   AssetImage themedImage(String name) {
     final path =
-        brightness == Brightness.dark ? 'assets/images/dark' : 'assets/images';
+    brightness == Brightness.dark ? 'assets/images/dark' : 'assets/images';
     return AssetImage('$path/$name');
   }
 }

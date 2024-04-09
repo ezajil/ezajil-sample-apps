@@ -1,4 +1,6 @@
 
+import 'dart:io';
+
 class Message {
   String chatroomId;
   String messageId;
@@ -6,6 +8,7 @@ class Message {
   String screenName;
   String content;
   Map<String, String>? mediaUrls;
+  File? file;
   bool preview;
   int sendingDate;
   MessageStatus status;

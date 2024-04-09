@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:whatsapp_clone/theme/theme.dart';
+import 'package:whatsapp_clone/utils/utils.dart';
 import 'package:whatsapp_clone/views/chat.dart';
 import 'package:whatsapp_clone/views/create_private_chatroom.dart';
 
@@ -376,44 +377,10 @@ class _RecentChatTimeState extends State<RecentChatTime> {
     super.dispose();
   }
 
-  String formatDate(int nanosecondsSinceEpoch,
-      [bool timeOnly = false, bool meridiem = false]) {
-    // Convert nanoseconds to microseconds since DateTime supports up to microseconds.
-    int microsecondsSinceEpoch = nanosecondsSinceEpoch ~/ 1000;
-
-    DateTime now = DateTime.now();
-    DateTime date = DateTime.fromMicrosecondsSinceEpoch(microsecondsSinceEpoch);
-
-    if (timeOnly || datesHaveSameDay(now, date)) {
-      return meridiem
-          ? DateFormat('hh:mm a').format(date)
-          : DateFormat('HH:mm').format(date);
-    }
-
-    if (isYesterday(date)) {
-      return 'Yesterday';
-    }
-
-    return DateFormat.yMd().format(date);
-  }
-
-  bool datesHaveSameDay(DateTime date1, DateTime date2) {
-    return date1.year == date2.year &&
-        date1.month == date2.month &&
-        date1.day == date2.day;
-  }
-
-  bool isYesterday(DateTime date) {
-    DateTime yesterday = DateTime.now().subtract(Duration(days: 1));
-    return date.year == yesterday.year &&
-        date.month == yesterday.month &&
-        date.day == yesterday.day;
-  }
-
   @override
   Widget build(BuildContext context) {
     return Text(
-      formatDate(
+      formatSendingDate(
         widget.chat.message.sendingDate,
       ),
       style: Theme.of(context).custom.textTheme.caption.copyWith(

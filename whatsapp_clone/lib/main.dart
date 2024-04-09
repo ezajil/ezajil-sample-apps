@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:whatsapp_clone/theme/theme.dart';
 import 'package:whatsapp_clone/views/homepage.dart';
 import 'package:whatsapp_clone/views/username-selection.dart';
 
@@ -16,10 +17,10 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Whatsapp',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-      ),
+      theme: lightThemeProvider,
+      darkTheme: darkThemeProvider,
+      themeMode: ThemeMode.system,
+      debugShowCheckedModeBanner: false,
       home: MainPage(),
     );
   }
