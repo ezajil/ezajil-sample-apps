@@ -34,6 +34,27 @@ bool isYesterday(DateTime date) {
       date.day == yesterday.day;
 }
 
+String timeFromSeconds(int seconds, [bool minWidth4 = false]) {
+  if (seconds == 0) return "0:00";
+
+  String result = DateFormat('HH:mm:ss').format(
+    DateTime(2022, 1, 1, 0, 0, seconds),
+  );
+
+  List resultParts = result.split(':');
+  for (int i = 0; i < resultParts.length; i++) {
+    if (resultParts[i] != "00") break;
+    resultParts[i] = "";
+  }
+  resultParts.removeWhere((element) => element == "");
+
+  if (minWidth4 && resultParts.length == 1) {
+    resultParts = ["0", ...resultParts];
+  }
+
+  return resultParts.join(':');
+}
+
 String strFormattedSize(num size) {
   size /= 1024;
 

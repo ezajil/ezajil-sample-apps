@@ -1,15 +1,41 @@
+import 'dart:async';
+import 'dart:io';
+
+import 'package:camera/camera.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
+import 'package:mime/mime.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:visibility_detector/visibility_detector.dart';
+import 'package:whatsapp_clone/models/attachment.dart';
 import 'package:whatsapp_clone/models/message.dart';
+import 'package:whatsapp_clone/theme/color_theme.dart';
 import 'package:whatsapp_clone/theme/theme.dart';
+import 'package:whatsapp_clone/utils/attachment_utils.dart';
+import 'package:whatsapp_clone/utils/shared_pref.dart';
 import 'package:whatsapp_clone/utils/utils.dart';
+import 'package:whatsapp_clone/views/attachment_picker.dart';
+import 'package:whatsapp_clone/views/widgets/attachment_sender.dart';
+import 'package:whatsapp_clone/views/widgets/bottom_inset.dart';
+import 'package:whatsapp_clone/views/widgets/camera.dart';
 import 'package:whatsapp_clone/views/widgets/chat_date.dart';
+import 'package:whatsapp_clone/views/widgets/chat_field.dart';
+import 'package:whatsapp_clone/views/widgets/emoji_picker.dart';
 import 'package:whatsapp_clone/views/widgets/message_card.dart';
 import 'package:whatsapp_clone/views/widgets/scroll_btn.dart';
 import 'package:whatsapp_clone/views/widgets/unread_banner.dart';
+import 'package:whatsapp_clone/views/widgets/voice_recorder.dart';
 
 import '../models/user.dart';
+
+enum RecordingState {
+  notRecording,
+  recording,
+  recordingLocked,
+  paused,
+}
 
 class ChatPage extends StatefulWidget {
   final User self;
@@ -104,7 +130,7 @@ class _ChatPageState extends State<ChatPage> {
       decoration: const BoxDecoration(
         image: DecorationImage(
           image: AssetImage('assets/images/chat_bg.png'),
-          fit: BoxFit.fill,
+          fit: BoxFit.cover,
         ),
       ),
       child: Column(
@@ -124,8 +150,10 @@ class _ChatPageState extends State<ChatPage> {
           const SizedBox(
             height: 4.0,
           ),
-          const Text('Chat input container will go here'),
-          // Replace with actual chat input widget
+          ChatInputContainer(
+            self: widget.self,
+            other: widget.other,
+          ),
         ],
       ),
     );
@@ -411,5 +439,462 @@ class _ChatStreamState extends State<ChatStream> {
   int getMessageIndexByKey(Key key, List<Message> messages) {
     final messageKey = key as ValueKey;
     return messages.indexWhere((msg) => msg.messageId == messageKey.value);
+  }
+}
+
+class ChatInputContainer extends StatefulWidget {
+  final User self;
+  final User other;
+
+  const ChatInputContainer({
+    super.key,
+    required this.self,
+    required this.other,
+  });
+
+  @override
+  State<ChatInputContainer> createState() => _ChatInputContainerState();
+}
+
+class _ChatInputContainerState extends State<ChatInputContainer>
+    with WidgetsBindingObserver {
+  double keyboardHeight = SharedPref.instance.getDouble('keyboardHeight')!;
+  bool isKeyboardVisible = false;
+  bool hideElements = false;
+  bool showEmojiPicker = false;
+  final FocusNode fieldFocusNode = FocusNode();
+  final TextEditingController messageController = TextEditingController();
+  final recordingState = RecordingState.notRecording;
+  late final StreamSubscription<bool> _keyboardSubscription;
+
+  @override
+  void initState() {
+    _keyboardSubscription =
+        KeyboardVisibilityController().onChange.listen((isVisible) async {
+      isKeyboardVisible = isVisible;
+      if (isVisible) {
+        setState(() {
+          showEmojiPicker = false;
+        });
+      }
+    });
+
+    super.initState();
+  }
+
+  @override
+  void dispose() async {
+    super.dispose();
+    _keyboardSubscription.cancel();
+    fieldFocusNode.dispose();
+    messageController.dispose();
+  }
+
+  void switchKeyboards() async {
+    if (!showEmojiPicker && !isKeyboardVisible) {
+      setState(() {
+        showEmojiPicker = true;
+      });
+    } else if (showEmojiPicker) {
+      fieldFocusNode.requestFocus();
+      SystemChannels.textInput.invokeMethod('TextInput.show');
+      Future.delayed(const Duration(milliseconds: 300), () {
+        if (!mounted || showEmojiPicker) return;
+        setState(() {
+          showEmojiPicker = true;
+        });
+      });
+    } else if (isKeyboardVisible) {
+      SystemChannels.textInput.invokeMethod('TextInput.hide');
+      setState(() {
+        showEmojiPicker = true;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final colorTheme = Theme.of(context).custom.colorTheme;
+
+    return Theme(
+      data: Theme.of(context).copyWith(
+        iconTheme: IconThemeData(
+            color: Theme.of(context).brightness == Brightness.light
+                ? colorTheme.greyColor
+                : colorTheme.iconColor),
+      ),
+      child: AvoidBottomInset(
+        padding: EdgeInsets.only(bottom: Platform.isAndroid ? 4.0 : 24.0),
+        conditions: [showEmojiPicker],
+        offstage: Offstage(
+          offstage: !showEmojiPicker,
+          child: CustomEmojiPicker(
+            afterEmojiPlaced: (emoji) => onTextChanged(emoji.emoji),
+            textController: messageController,
+            onTextChanged: onTextChanged,
+          ),
+        ),
+        child: recordingState != RecordingState.recordingLocked &&
+                recordingState != RecordingState.paused
+            ? Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Expanded(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(24.0),
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? colorTheme.appBarColor
+                              : colorTheme.backgroundColor,
+                        ),
+                        child: recordingState == RecordingState.notRecording
+                            ? _buildChatField(
+                                showEmojiPicker,
+                                context,
+                                hideElements,
+                                colorTheme,
+                              )
+                            : const VoiceRecorderField(),
+                      ),
+                    ),
+                    const SizedBox(
+                      width: 4.0,
+                    ),
+                    hideElements
+                        ? InkWell(
+                            onTap: () async {
+                              // TODO
+                            },
+                            child: CircleAvatar(
+                              radius: 24,
+                              backgroundColor: colorTheme.greenColor,
+                              child: const Icon(
+                                Icons.send,
+                                color: Colors.white,
+                              ),
+                            ),
+                          )
+                        : const ChatInputMic(),
+                  ],
+                ),
+              )
+            : const VoiceRecorder(),
+      ),
+    );
+  }
+
+  ChatField _buildChatField(bool showEmojiPicker, BuildContext context,
+      bool hideElements, ColorTheme colorTheme) {
+    return ChatField(
+        leading: GestureDetector(
+          onTap: switchKeyboards,
+          child: Icon(
+            !showEmojiPicker ? Icons.emoji_emotions : Icons.keyboard,
+            size: 26.0,
+          ),
+        ),
+        focusNode: fieldFocusNode,
+        onTextChanged: (value) => onTextChanged(value),
+        textController: messageController,
+        actions: [
+          InkWell(
+            onTap: () {
+              onAttachmentsIconPressed(
+                context,
+              );
+            },
+            child: Transform.rotate(
+              angle: -0.8,
+              child: const Icon(
+                Icons.attach_file_rounded,
+                size: 26.0,
+              ),
+            ),
+          ),
+          if (!hideElements) ...[
+            InkWell(
+              onTap: () {},
+              child: Container(
+                width: 21,
+                height: 21,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Theme.of(context).brightness == Brightness.light
+                      ? colorTheme.greyColor
+                      : colorTheme.iconColor,
+                ),
+                child: Center(
+                  child: Text(
+                    '₹',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontWeight: FontWeight.w500,
+                      fontSize: 16,
+                      color: Theme.of(context).brightness == Brightness.light
+                          ? colorTheme.backgroundColor
+                          : colorTheme.appBarColor,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            InkWell(
+              onTap: () {
+                navigateToCameraView(context);
+              },
+              child: const Icon(
+                Icons.camera_alt_rounded,
+                size: 24.0,
+              ),
+            ),
+          ],
+        ]);
+  }
+
+  void onTextChanged(String value) {
+    if (value.isEmpty) {
+      setState(() {
+        hideElements = false;
+      });
+    } else if (value != ' ') {
+      setState(() {
+        hideElements = true;
+      });
+    } else {
+      setState(() {
+        messageController.text = '';
+      });
+    }
+  }
+
+  void onAttachmentsIconPressed(BuildContext context) {
+    fieldFocusNode.unfocus();
+    Future.delayed(
+      Duration(
+        milliseconds: MediaQuery.of(context).viewInsets.bottom > 0 ? 300 : 0,
+      ),
+      () async {
+        if (!mounted) return;
+        showDialog(
+          barrierColor: null,
+          context: context,
+          builder: (context) {
+            return Dialog(
+              alignment: Alignment.bottomCenter,
+              insetPadding: EdgeInsets.symmetric(
+                horizontal: 10.0,
+                vertical: showEmojiPicker ? 36.0 : 56.0,
+              ),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16.0),
+              ),
+              elevation: 0,
+              child: Padding(
+                padding: const EdgeInsets.only(top: 24.0),
+                child: AttachmentPicker(
+                  self: widget.self,
+                  other: widget.other,
+                  pickDocuments: pickDocuments,
+                  pickAttachmentsFromGallery: pickAttachmentsFromGallery,
+                  pickAudioFiles: pickAudioFiles,
+                  navigateToCameraView: navigateToCameraView,
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Future<List<Attachment>?> pickDocuments(
+    BuildContext context, {
+    bool returnAttachments = false,
+  }) async {
+    final key = showLoading(context);
+
+    List<File>? files = await pickFiles(type: FileType.any);
+    if (files == null) {
+      Navigator.pop(key.currentContext!);
+      return null;
+    }
+
+    final attachments = createAttachmentsFromFiles(
+      files,
+      areDocuments: true,
+    );
+
+    if (returnAttachments) {
+      Navigator.pop(key.currentContext!);
+      return attachments;
+    }
+
+    if (!mounted) return null;
+    Navigator.pop(key.currentContext!);
+    navigateToAttachmentSender(context, attachments);
+    return null;
+  }
+
+  Future<List<Attachment>?> pickAttachmentsFromGallery(
+    BuildContext context, {
+    bool returnAttachments = false,
+  }) async {
+    if (Platform.isAndroid &&
+        (!await hasPermission(Permission.storage)) &&
+        (!await hasPermission(Permission.photos))) {
+      return null;
+    }
+
+    if (!context.mounted) return null;
+
+    // if (Platform.isAndroid) {
+    //   Navigator.of(context).push(
+    //     MaterialPageRoute(
+    //       builder: (context) => Gallery(
+    //         title: 'Send to ${widget.other.screenName}',
+    //       ),
+    //     ),
+    //   );
+    //   return null;
+    // }
+
+    final key = showLoading(context);
+
+    List<File>? files = await pickMultimedia();
+    if (files == null) {
+      Navigator.pop(key.currentContext!);
+      return null;
+    }
+
+    final attachments = createAttachmentsFromFiles(files);
+    if (returnAttachments) {
+      Navigator.pop(key.currentContext!);
+      return attachments;
+    }
+
+    if (!mounted) return null;
+    Navigator.pop(key.currentContext!);
+    navigateToAttachmentSender(context, attachments);
+    return null;
+  }
+
+  Future<void> pickAudioFiles(
+    BuildContext context,
+  ) async {
+    final key = showLoading(context);
+
+    List<File>? files = await pickFiles(type: FileType.audio);
+    if (files == null) {
+      Navigator.pop(key.currentContext!);
+      return;
+    }
+
+    final attachments = createAttachmentsFromFiles(files);
+
+    if (!mounted) return;
+    Navigator.pop(key.currentContext!);
+    navigateToAttachmentSender(context, attachments);
+  }
+
+  GlobalKey showLoading(context) {
+    final dialogKey = GlobalKey();
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) {
+        return AlertDialog(
+          key: dialogKey,
+          content: Row(
+            children: [
+              const CircularProgressIndicator(),
+              const SizedBox(width: 24),
+              Text(
+                'Preparing media',
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Theme.of(context).custom.colorTheme.textColor2,
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+
+    return dialogKey;
+  }
+
+  Future<List<Attachment>> createAttachmentsFromFiles(
+    List<File> files, {
+    bool areDocuments = false,
+  }) async {
+    return await Future.wait(
+      files.map((file) async {
+        final type = areDocuments
+            ? AttachmentType.document
+            : AttachmentType.fromValue(
+                lookupMimeType(file.path)?.split("/")[0].toUpperCase() ??
+                    'DOCUMENT',
+              );
+
+        double? width, height;
+        if (type == AttachmentType.image) {
+          (width, height) = await getImageDimensions(File(file.path));
+        } else if (type == AttachmentType.video) {
+          (width, height) = await getVideoDimensions(File(file.path));
+        }
+
+        final fileName = file.path.split("/").last;
+
+        return Attachment(
+          type: type.name,
+          url: "",
+          autoDownload:
+              type == AttachmentType.image || type == AttachmentType.voice,
+          fileName: fileName,
+          fileSize: await file.length(),
+          fileExtension: fileName.split(".").last,
+          width: width,
+          height: height,
+          file: file,
+        );
+      }),
+    );
+  }
+
+  Future<void> navigateToCameraView(BuildContext context) async {
+    final cameras = await availableCameras();
+    if (!mounted) return;
+
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => CameraView(
+          self: widget.self,
+          other: widget.other,
+          cameras: cameras,
+          createAttachmentsFromFiles: createAttachmentsFromFiles,
+          pickDocuments: pickDocuments,
+          pickAttachmentsFromGallery: pickAttachmentsFromGallery,
+        ),
+      ),
+    );
+  }
+
+  void navigateToAttachmentSender(
+    BuildContext context,
+    Future<List<Attachment>> attachments,
+  ) {
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(
+        builder: (_) => AttachmentMessageSender(
+            self: widget.self,
+            other: widget.other,
+            attachmentsFuture: attachments,
+            pickDocuments: pickDocuments,
+            pickAttachmentsFromGallery: pickAttachmentsFromGallery),
+      ),
+    );
   }
 }
