@@ -3,7 +3,6 @@ import 'dart:io';
 
 import 'package:audioplayers/audioplayers.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -1246,7 +1245,7 @@ class DownloadingAttachment extends ConsumerStatefulWidget {
 class _DownloadingAttachmentState extends ConsumerState<DownloadingAttachment> {
   late bool isDownloading;
   late bool clientIsSender;
-  Stream<TaskSnapshot>? downloadStream;
+  Stream<String>? downloadStream;
 
   @override
   void initState() {
@@ -1268,7 +1267,7 @@ class _DownloadingAttachmentState extends ConsumerState<DownloadingAttachment> {
   Future<void> download() async {
     await ref.read(chatControllerProvider.notifier).downloadAttachment(
       widget.message,
-      (_) {
+      () {
         widget.onDone();
       },
       () {
@@ -1357,24 +1356,26 @@ class _DownloadingAttachmentState extends ConsumerState<DownloadingAttachment> {
 
         final snapData = snapshot.data!;
 
-        switch (snapData.state) {
-          case TaskState.running:
-            return ProgressCancelBtn(
-              onTap: cancel,
-              progressValue: snapData.bytesTransferred / snapData.totalBytes,
-              overlayColor: widget.showSize ? overlayColor : Colors.transparent,
-            );
-          case TaskState.success:
-            return const CircularProgressIndicator(
-              strokeWidth: 3.0,
-            );
-          case TaskState.error:
-            return const CircularProgressIndicator(
-              strokeWidth: 3.0,
-            );
-          default:
-            return noProgressIndicator;
-        }
+        // switch (snapData.state) {
+        //   case TaskState.running:
+        //     return ProgressCancelBtn(
+        //       onTap: cancel,
+        //       progressValue: snapData.bytesTransferred / snapData.totalBytes,
+        //       overlayColor: widget.showSize ? overlayColor : Colors.transparent,
+        //     );
+        //   case TaskState.success:
+        //     return const CircularProgressIndicator(
+        //       strokeWidth: 3.0,
+        //     );
+        //   case TaskState.error:
+        //     return const CircularProgressIndicator(
+        //       strokeWidth: 3.0,
+        //     );
+        //   default:
+        //     return noProgressIndicator;
+        // }
+        //TODO
+        return noProgressIndicator;
       },
     );
   }
@@ -1397,7 +1398,7 @@ class UploadingAttachment extends ConsumerStatefulWidget {
 
 class _UploadingAttachmentState extends ConsumerState<UploadingAttachment> {
   late bool isUploading;
-  late Stream<TaskSnapshot> uploadStream;
+  late Stream<String> uploadStream;
   late bool clientIsSender;
 
   @override
@@ -1512,28 +1513,30 @@ class _UploadingAttachmentState extends ConsumerState<UploadingAttachment> {
 
         final snapData = snapshot.data!;
 
-        switch (snapData.state) {
-          case TaskState.running:
-            return ProgressCancelBtn(
-              onTap: stopUpload,
-              overlayColor: widget.showSize ? overlayColor : Colors.transparent,
-              progressValue: snapData.bytesTransferred / snapData.totalBytes,
-            );
-          case TaskState.success:
-            return const CircularProgressIndicator(
-              strokeWidth: 3.0,
-            );
-          case TaskState.error:
-            WidgetsBinding.instance.addPostFrameCallback((_) async {
-              if (!mounted) return;
-              setState(() => isUploading = false);
-            });
-            return const CircularProgressIndicator(
-              strokeWidth: 3.0,
-            );
-          default:
-            return noProgressIndicator;
-        }
+        // switch (snapData.state) {
+        //   case TaskState.running:
+        //     return ProgressCancelBtn(
+        //       onTap: stopUpload,
+        //       overlayColor: widget.showSize ? overlayColor : Colors.transparent,
+        //       progressValue: snapData.bytesTransferred / snapData.totalBytes,
+        //     );
+        //   case TaskState.success:
+        //     return const CircularProgressIndicator(
+        //       strokeWidth: 3.0,
+        //     );
+        //   case TaskState.error:
+        //     WidgetsBinding.instance.addPostFrameCallback((_) async {
+        //       if (!mounted) return;
+        //       setState(() => isUploading = false);
+        //     });
+        //     return const CircularProgressIndicator(
+        //       strokeWidth: 3.0,
+        //     );
+        //   default:
+        //     return noProgressIndicator;
+        // }
+        // TODO
+        return noProgressIndicator;
       },
     );
   }

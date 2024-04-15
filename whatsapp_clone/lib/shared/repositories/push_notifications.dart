@@ -1,26 +1,22 @@
-import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:whatsapp_clone/shared/utils/shared_pref.dart';
 
 import '../../features/chat/models/message.dart';
 
 final pushNotificationsRepoProvider = Provider(
-  (ref) => PushNotificationsRepo(FirebaseMessaging.instance, ref),
+  (ref) => PushNotificationsRepo(ref),
 );
 
 class PushNotificationsRepo {
-  final FirebaseMessaging instance;
   final ProviderRef ref;
 
-  PushNotificationsRepo(this.instance, this.ref);
+  PushNotificationsRepo(this.ref);
 
   Future<void> init({
-    required Future<void> Function(RemoteMessage) onMessageOpenedApp,
+    required Future<void> Function() onMessageOpenedApp,
   }) async {
-    FirebaseMessaging.onBackgroundMessage(_handleBackgroundMessage);
-    FirebaseMessaging.onMessageOpenedApp.listen(onMessageOpenedApp);
-    instance.onTokenRefresh.listen((token) => handleTokenRefresh(token, ref));
+    // FirebaseMessaging.onBackgroundMessage(_handleBackgroundMessage);
+    // FirebaseMessaging.onMessageOpenedApp.listen(onMessageOpenedApp);
+    // instance.onTokenRefresh.listen((token) => handleTokenRefresh(token, ref));
   }
 
   Future<void> sendPushNotification(Message message) async {
@@ -54,16 +50,9 @@ class PushNotificationsRepo {
   }
 }
 
-Future<void> _handleBackgroundMessage(RemoteMessage message) async {
-  await Firebase.initializeApp();
-  final data = message.data;
-
+Future<void> _handleBackgroundMessage(Message message) async {
   //TODO
 }
 
 void handleTokenRefresh(String newToken, ProviderRef ref) {
-  final oldToken = SharedPref.instance.getString('fcmToken');
-  if (newToken == oldToken) return;
-
-  SharedPref.instance.setString('fcmToken', newToken);
 }

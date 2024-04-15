@@ -3,9 +3,7 @@ import 'dart:io';
 
 import 'package:audio_session/audio_session.dart';
 import 'package:camera/camera.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_sound/flutter_sound.dart';
@@ -223,9 +221,9 @@ class ChatStateNotifier extends StateNotifier<ChatState> {
 
     final recordedFile = File(path!);
     final messageId = const Uuid().v4();
-    final timestamp = Timestamp.now();
+    final timestamp = DateTime.now().microsecondsSinceEpoch;
     final ext = path.split(".").last;
-    final fileName = "AUD_${timestamp.seconds}.$ext";
+    final fileName = "AUD_$timestamp.$ext";
 
     await recordedFile.copy(
       DeviceStorage.getMediaFilePath(fileName),
@@ -320,7 +318,7 @@ class ChatStateNotifier extends StateNotifier<ChatState> {
   }
 
   Future<void> uploadCompleteHandler(
-    TaskSnapshot snapshot,
+    // TaskSnapshot snapshot,
     Message message,
   ) async {
     // TODO
@@ -338,7 +336,7 @@ class ChatStateNotifier extends StateNotifier<ChatState> {
 
   Future<void> downloadAttachment(
     Message message,
-    void Function(TaskSnapshot) onComplete,
+    void Function() onComplete,
     void Function() onError,
   ) async {
     await DownloadService.download(
