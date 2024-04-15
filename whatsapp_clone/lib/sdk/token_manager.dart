@@ -4,6 +4,17 @@ class TokenManager {
   String? accessToken;
   Future<String> Function()? fetchTokenCallback;
 
+  // Private constructor
+  TokenManager._privateConstructor();
+
+  // Single instance, private static
+  static final TokenManager _instance = TokenManager._privateConstructor();
+
+  // Public factory constructor to access the instance
+  factory TokenManager() {
+    return _instance;
+  }
+
   void setToken(String token) {
     accessToken = token;
   }

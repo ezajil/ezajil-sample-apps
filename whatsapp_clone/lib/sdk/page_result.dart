@@ -1,12 +1,10 @@
-
 class PageResult<T> {
-  List<T> results;
-  String pagingState;
-  int totalResults;
+  final List<T> results;
+  final String pagingState;
+  final int totalResults;
 
-  PageResult(List<T> results, String pagingState, int totalResults) {
-    results = results;
-    pagingState = pagingState;
-    totalResults = totalResults;
-  }
+  PageResult(
+      {required this.results,
+      required this.pagingState,
+      required this.totalResults});
 }

@@ -50,6 +50,21 @@ class Message {
     this.attachment,
   });
 
+  factory Message.fromJson(Map<String, dynamic> json) {
+    return Message(
+      chatroomId: json['chatroomId'],
+      messageId: json['messageId'],
+      author: json['author'],
+      screenName: json['screenName'],
+      content: json['content'],
+      mediaUrls: json['mediaUrls']?.cast<String, String>(),
+      preview: json['preview'],
+      sendingDate: json['sendingDate'],
+      status: MessageStatus.values.firstWhere((e) => e.toString().split('.').last.toUpperCase() == json['status'].toUpperCase()),
+      systemMessage: json['systemMessage'],
+      attachment: json['attachment'] != null ? Attachment.fromJson(json['attachment']) : null,
+    );
+  }
 }
 
 enum MessageAction {

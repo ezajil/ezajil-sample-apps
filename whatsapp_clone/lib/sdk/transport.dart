@@ -1,28 +1,24 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
 
-import 'package:whatsapp_clone/sdk/session.dart';
 import 'package:whatsapp_clone/sdk/token_manager.dart';
 
 class Transport {
   WebSocket? _conn;
-  String wsEndpoint;
-  TokenManager
-      tokenManager; // This should be defined according to your token management in Dart
+  final String wsEndpoint;
+  final TokenManager tokenManager = TokenManager();
   ConnectionState connectionState = ConnectionState.disconnected;
-  StreamController _controller = StreamController.broadcast();
+  final StreamController _controller = StreamController.broadcast();
   Timer? _pingTimeoutId;
   Timer? _reconnectId;
   int pingInterval = 10000;
-  double maxReconnectInterval = 30000;
+  int maxReconnectInterval = 30000;
   int reconnectExponentialBackoff = 2;
   int? reconnectAttempts;
 
-  Transport(Session session) {
-    wsEndpoint = session.wsEndpoint;
-    tokenManager = session.tokenManager;
-  }
+  Transport({required this.wsEndpoint});
 
   Stream<dynamic> on(String event) => _controller.stream
       .where((e) => e['event'] == event)
@@ -111,9 +107,9 @@ class Transport {
     _reconnect();
   }
 
-  void send(String message) {
+  void send(dynamic data) {
     try {
-      _conn?.add(message);
+      _conn?.add(jsonEncode(data));
     } catch (e) {
       print('Error sending message: $e');
     }
@@ -126,7 +122,7 @@ class Transport {
     }
 
     final int reconnectInterval = min(
-        (reconnectAttempts ?? 0.0) * reconnectExponentialBackoff * 1000.0,
+        (reconnectAttempts ?? 0) * reconnectExponentialBackoff * 1000,
         maxReconnectInterval);
 
     print(

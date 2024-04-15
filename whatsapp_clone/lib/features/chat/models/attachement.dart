@@ -71,7 +71,7 @@ class Attachment {
     this.samples,
   });
 
-  factory Attachment.fromMap(Map<String, dynamic> data) {
+  factory Attachment.fromJson(Map<String, dynamic> data) {
     return Attachment(
       url: data["url"],
       fileName: data["fileName"],
